@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+
+int main(int argc, char *argv[]) {
+    DIR *dir;
+    struct dirent *entry;
+
+    // Check if a directory is provided as a command-line argument
+    if (argc < 2) {
+        // If no directory is provided, open the current directory
+        dir = opendir(".");
+    } else {
+        // If a directory is provided, open that directory
+        dir = opendir(argv[1]);
+    }
+
+    if (dir == NULL) {
+        perror("Error opening directory");
+        exit(EXIT_FAILURE);
+    }
+
+    // Print the contents of the directory
+    printf("Contents of directory:\n");
+    while ((entry = readdir(dir)) != NULL) {
+        printf("%s\n", entry->d_name);
+    }
+
+    closedir(dir);
+    return 0;
+}
