@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <string.h>
+
+#define BUFFER_SIZE 1024
+
+void demonstrate_fcntl(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+
+    int fd = fileno(file);
+    if (fd == -1) {
+        perror("Error getting file descriptor");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("File descriptor for %s: %d\n", filename, fd);
+
+    if (fclose(file) == EOF) {
+        perror("Error closing file");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void demonstrate_lseek(const char *filename) {
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+
+    off_t offset = lseek(fd, 0, SEEK_END);
+    if (offset == -1) {
+        perror("Error seeking file");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Size of %s: %ld bytes\n", filename, (long)offset);
+
+    if (close(fd) == -1) {
+        perror("Error closing file");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void demonstrate_stat(const char *filename) {
+    struct stat st;
+    if (stat(filename, &st) == -1) {
+        perror("Error getting file information");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("File information for %s:\n", filename);
+    printf("Size: %ld bytes\n", st.st_size);
+    printf("Permissions: %o\n", st.st_mode & 0777);
+    printf("Owner UID: %d\n", st.st_uid);
+    printf("Group GID: %d\n", st.st_gid);
+}
+
+void demonstrate_opendir_readdir(const char *dirname) {
+    DIR *dir = opendir(dirname);
+    if (!dir) {
+        perror("Error opening directory");
+        exit(EXIT_FAILURE);
+    }
+
+    struct dirent *entry;
+    printf("Contents of directory %s:\n", dirname);
+    while ((entry = readdir(dir)) != NULL) {
+        printf("%s\n", entry->d_name);
+    }
+
+    closedir(dir);
+}
+
+int main() {
+    const char *filename = "example.txt";
+    const char *dirname = "."; // Current directory
+
+    printf("Demonstrating file descriptor (equivalent to fcntl) system call:\n");
+    demonstrate_fcntl(filename);
+
+    printf("\nDemonstrating lseek system call:\n");
+    demonstrate_lseek(filename);
+
+    printf("\nDemonstrating stat system call:\n");
+    demonstrate_stat(filename);
+
+    printf("\nDemonstrating opendir and readdir system calls:\n");
+    demonstrate_opendir_readdir(dirname);
+
+    return 0;
+}
