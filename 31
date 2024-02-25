@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_FRAMES 3
+#define MAX_PAGES 20
+
+void lru(int pages[], int n) {
+    int frames[MAX_FRAMES];
+    int page_faults = 0;
+    int frame_index = 0;
+    int recent[MAX_FRAMES];
+    int i, j;
+
+    // Initialize frames with -1 indicating empty frame
+    for (i = 0; i < MAX_FRAMES; i++) {
+        frames[i] = -1;
+        recent[i] = 0;
+    }
+
+    printf("Page\t Frames\n");
+    for (i = 0; i < n; i++) {
+        printf("%d\t", pages[i]);
+
+        int page_found = 0;
+        for (j = 0; j < MAX_FRAMES; j++) {
+            if (frames[j] == pages[i]) {
+                page_found = 1;
+                recent[j] = i + 1; // Update the recent count
+                break;
+            }
+        }
+
+        if (!page_found) {
+            int min_recent = recent[0];
+            int min_index = 0;
+            for (j = 1; j < MAX_FRAMES; j++) {
+                if (recent[j] < min_recent) {
+                    min_recent = recent[j];
+                    min_index = j;
+                }
+            }
+
+            frames[min_index] = pages[i];
+            recent[min_index] = i + 1;
+            page_faults++;
+        }
+
+        for (j = 0; j < MAX_FRAMES; j++) {
+            printf("%d\t", frames[j]);
+        }
+        printf("\n");
+    }
+
+    printf("\nTotal Page Faults: %d\n", page_faults);
+}
+
+int main() {
+    int pages[MAX_PAGES] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1};
+    int n = sizeof(pages) / sizeof(pages[0]);
+
+    lru(pages, n);
+
+    return 0;
+}
