@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MEMORY_SIZE 100
+#define NUM_PROCESSES 5
+
+typedef struct {
+    int id;
+    int size;
+} Process;
+
+void bestFit(Process processes[], int numProcesses, int memory[], int memorySize) {
+    int i, j;
+    for (i = 0; i < numProcesses; i++) {
+        int bestFitIndex = -1;
+        for (j = 0; j < memorySize; j++) {
+            if (memory[j] >= processes[i].size) {
+                if (bestFitIndex == -1 || memory[j] < memory[bestFitIndex]) {
+                    bestFitIndex = j;
+                }
+            }
+        }
+
+        if (bestFitIndex != -1) {
+            memory[bestFitIndex] -= processes[i].size;
+            printf("Allocated Process %d of size %d at Memory Block %d\n", processes[i].id, processes[i].size, bestFitIndex);
+        } else {
+            printf("Cannot allocate Process %d of size %d\n", processes[i].id, processes[i].size);
+        }
+    }
+}
+
+int main() {
+    Process processes[NUM_PROCESSES] = {{1, 20}, {2, 10}, {3, 30}, {4, 40}, {5, 5}};
+    int memory[MEMORY_SIZE] = {100};
+
+    bestFit(processes, NUM_PROCESSES, memory, MEMORY_SIZE);
+
+    return 0;
+}
