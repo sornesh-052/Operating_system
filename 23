@@ -1,0 +1,87 @@
+#include <stdio.h>
+
+#define MAX_MEMORY_SIZE 100
+#define MAX_PROCESS_SIZE 10
+
+int memory[MAX_MEMORY_SIZE];
+int processes[MAX_PROCESS_SIZE];
+int num_processes;
+
+void initializeMemory() {
+    for (int i = 0; i < MAX_MEMORY_SIZE; i++) {
+        memory[i] = -1; // -1 indicates the memory is free
+    }
+}
+
+void allocateMemory(int process_size) {
+    int allocated = 0;
+    for (int i = 0; i < MAX_MEMORY_SIZE; i++) {
+        if (memory[i] == -1) {
+            int j;
+            for (j = i; j < i + process_size && j < MAX_MEMORY_SIZE; j++) {
+                if (memory[j] != -1)
+                    break; // Memory block not free, break the loop
+            }
+            if (j - i == process_size) {
+                allocated = 1;
+                for (int k = i; k < j; k++) {
+                    memory[k] = process_size;
+                }
+                printf("Process of size %d allocated at memory block starting from index %d.\n", process_size, i);
+                break;
+            }
+        }
+    }
+    if (!allocated) {
+        printf("Memory allocation failed for process of size %d.\n", process_size);
+    }
+}
+
+void deallocateMemory(int process_size) {
+    for (int i = 0; i < MAX_MEMORY_SIZE; i++) {
+        if (memory[i] == process_size) {
+            memory[i] = -1;
+        }
+    }
+    printf("Memory block of size %d deallocated.\n", process_size);
+}
+
+void displayMemory() {
+    printf("Memory Status:\n");
+    for (int i = 0; i < MAX_MEMORY_SIZE; i++) {
+        if (memory[i] == -1) {
+            printf("[ ] "); // Free memory block
+        } else {
+            printf("[%d] ", memory[i]); // Occupied memory block
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    initializeMemory();
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &num_processes);
+
+    printf("Enter the size of each process:\n");
+    for (int i = 0; i < num_processes; i++) {
+        scanf("%d", &processes[i]);
+    }
+
+    printf("Initial Memory Status:\n");
+    displayMemory();
+
+    for (int i = 0; i < num_processes; i++) {
+        allocateMemory(processes[i]);
+        displayMemory();
+    }
+
+    printf("Deallocating memory blocks...\n");
+    for (int i = 0; i < num_processes; i++) {
+        deallocateMemory(processes[i]);
+        displayMemory();
+    }
+
+    return 0;
+}
