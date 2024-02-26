@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+#define BUFFER_SIZE 1024
+
+int main() {
+    int fd; // File descriptor
+    ssize_t num_bytes; // Number of bytes read/written
+    char buffer[BUFFER_SIZE];
+
+    // Create a new file
+    fd = creat("test.txt", 0644);
+    if (fd == -1) {
+        perror("Error creating file");
+        exit(EXIT_FAILURE);
+    }
+    printf("File 'test.txt' created successfully.\n");
+
+    // Open the file for writing
+    fd = open("test.txt", O_WRONLY);
+    if (fd == -1) {
+        perror("Error opening file for writing");
+        exit(EXIT_FAILURE);
+    }
+
+    // Write to the file
+    const char *text = "This is a test file.\n";
+    num_bytes = write(fd, text, strlen(text));
+    if (num_bytes == -1) {
+        perror("Error writing to file");
+        exit(EXIT_FAILURE);
+    }
+    printf("Data written to file 'test.txt'.\n");
+
+    // Close the file
+    if (close(fd) == -1) {
+        perror("Error closing file");
+        exit(EXIT_FAILURE);
+    }
+    printf("File 'test.txt' closed successfully.\n");
+
+    // Open the file for reading
+    fd = open("test.txt", O_RDONLY);
+    if (fd == -1) {
+        perror("Error opening file for reading");
+        exit(EXIT_FAILURE);
+    }
+
+    // Read from the file
+    num_bytes = read(fd, buffer, BUFFER_SIZE);
+    if (num_bytes == -1) {
+        perror("Error reading from file");
+        exit(EXIT_FAILURE);
+    }
+    buffer[num_bytes] = '\0'; // Null terminate the string
+    printf("Data read from file: %s\n", buffer);
+
+    // Close the file
+    if (close(fd) == -1) {
+        perror("Error closing file");
+        exit(EXIT_FAILURE);
+    }
+    printf("File 'test.txt' closed successfully.\n");
+
+    return 0;
+}
