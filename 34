@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_RECORDS 100
+
+// Structure to represent a record
+typedef struct {
+    int id;
+    char data[100];
+} Record;
+
+// Structure to represent a file
+typedef struct {
+    Record records[MAX_RECORDS];
+    int count;
+} File;
+
+// Function to initialize a file
+void initializeFile(File *file) {
+    file->count = 0;
+}
+
+// Function to add a record to the file
+void addRecord(File *file, int id, const char *data) {
+    if (file->count < MAX_RECORDS) {
+        Record record;
+        record.id = id;
+        strncpy(record.data, data, sizeof(record.data));
+        file->records[file->count++] = record;
+    } else {
+        printf("File is full. Cannot add more records.\n");
+    }
+}
+
+// Function to read all records in the file
+void readRecords(File *file) {
+    printf("Records in the file:\n");
+    for (int i = 0; i < file->count; ++i) {
+        printf("Record ID: %d, Data: %s\n", file->records[i].id, file->records[i].data);
+    }
+}
+
+int main() {
+    File file;
+    initializeFile(&file);
+
+    // Adding some records
+    addRecord(&file, 1, "Data of record 1");
+    addRecord(&file, 2, "Data of record 2");
+    addRecord(&file, 3, "Data of record 3");
+
+    // Reading all records
+    readRecords(&file);
+
+    return 0;
+}
