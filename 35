@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_BLOCKS 100
+#define BLOCK_SIZE 100
+
+// Structure to represent a file block
+typedef struct {
+    char data[BLOCK_SIZE];
+} Block;
+
+// Structure to represent the file
+typedef struct {
+    Block blocks[MAX_BLOCKS];
+    int indexBlock[MAX_BLOCKS]; // Index block
+    int count;
+} File;
+
+// Function to initialize the file
+void initializeFile(File *file) {
+    file->count = 0;
+    memset(file->indexBlock, -1, sizeof(file->indexBlock)); // Initialize index block pointers to -1
+}
+
+// Function to add a block to the file
+void addBlock(File *file, const char *data) {
+    if (file->count < MAX_BLOCKS) {
+        // Store data in a new block
+        strncpy(file->blocks[file->count].data, data, sizeof(file->blocks[file->count].data));
+        
+        // Update index block pointer
+        file->indexBlock[file->count] = file->count;
+        
+        // Increment the block count
+        file->count++;
+    } else {
+        printf("File is full. Cannot add more blocks.\n");
+    }
+}
+
+// Function to read all blocks of the file
+void readBlocks(File *file) {
+    printf("Contents of the file:\n");
+    for (int i = 0; i < file->count; ++i) {
+        printf("Block %d: %s\n", i, file->blocks[file->indexBlock[i]].data);
+    }
+}
+
+int main() {
+    File file;
+    initializeFile(&file);
+
+    // Adding some blocks
+    addBlock(&file, "Data of block 0");
+    addBlock(&file, "Data of block 1");
+    addBlock(&file, "Data of block 2");
+
+    // Reading all blocks
+    readBlocks(&file);
+
+    return 0;
+}
