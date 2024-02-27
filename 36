@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define BLOCK_SIZE 100
+
+// Structure to represent a block in the disk
+typedef struct Block {
+    char data[BLOCK_SIZE];
+    struct Block *next; // Pointer to the next block
+} Block;
+
+// Structure to represent a file
+typedef struct {
+    Block *head; // Pointer to the first block
+    Block *tail; // Pointer to the last block
+} File;
+
+// Function to initialize a file
+void initializeFile(File *file) {
+    file->head = NULL;
+    file->tail = NULL;
+}
+
+// Function to add a block to the file
+void addBlock(File *file, const char *data) {
+    Block *newBlock = (Block *)malloc(sizeof(Block));
+    if (newBlock == NULL) {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+    strncpy(newBlock->data, data, BLOCK_SIZE);
+    newBlock->next = NULL;
+
+    if (file->head == NULL) {
+        file->head = newBlock;
+        file->tail = newBlock;
+    } else {
+        file->tail->next = newBlock;
+        file->tail = newBlock;
+    }
+}
+
+// Function to read all blocks of the file
+void readBlocks(File *file) {
+    printf("Contents of the file:\n");
+    Block *currentBlock = file->head;
+    while (currentBlock != NULL) {
+        printf("%s\n", currentBlock->data);
+        currentBlock = currentBlock->next;
+    }
+}
+
+// Function to deallocate all blocks of the file
+void deallocateBlocks(File *file) {
+    Block *currentBlock = file->head;
+    while (currentBlock != NULL) {
+        Block *temp = currentBlock;
+        currentBlock = currentBlock->next;
+        free(temp);
+    }
+    file->head = NULL;
+    file->tail = NULL;
+}
+
+int main() {
+    File file;
+    initializeFile(&file);
+
+    // Adding some blocks
+    addBlock(&file, "Data of block 1");
+    addBlock(&file, "Data of block 2");
+    addBlock(&file, "Data of block 3");
+
+    // Reading all blocks
+    readBlocks(&file);
+
+    // Deallocating blocks
+    deallocateBlocks(&file);
+
+    return 0;
+}
