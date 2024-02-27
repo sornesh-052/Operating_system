@@ -1,0 +1,28 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+
+int main() {
+    int n, head, total_seek_time = 0;
+    printf("Enter the number of requests: ");
+    scanf("%d", &n);
+    int requests[n];
+
+    printf("Enter the requests: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &requests[i]);
+    }
+
+    printf("Enter the initial head position: ");
+    scanf("%d", &head);
+
+    // FCFS Algorithm
+    for (int i = 0; i < n; i++) {
+        total_seek_time += abs(head - requests[i]);
+        head = requests[i];
+    }
+
+    printf("Total seek time: %d\n", total_seek_time);
+
+    return 0;
+}
