@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+
+int main() {
+    char *filename = "example.txt";
+
+    // Creating a file
+    FILE *file = fopen(filename, "w");
+    if (file == NULL) {
+        perror("Error creating file");
+        return 1;
+    }
+    fprintf(file, "This is a test file.\n");
+    fclose(file);
+
+    // Setting file permissions (read and write for owner, read only for group and others)
+    if (chmod(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) != 0) {
+        perror("Error setting file permissions");
+        return 1;
+    }
+    printf("File permissions set successfully.\n");
+
+    // Reading file permissions
+    struct stat st;
+    if (stat(filename, &st) != 0) {
+        perror("Error getting file information");
+        return 1;
+    }
+
+    printf("File access permissions: ");
+    printf((st.st_mode & S_IRUSR) ? "r" : "-");
+    printf((st.st_mode & S_IWUSR) ? "w" : "-");
+    printf((st.st_mode & S_IXUSR) ? "x" : "-");
+    printf((st.st_mode & S_IRGRP) ? "r" : "-");
+    printf((st.st_mode & S_IWGRP) ? "w" : "-");
+    printf((st.st_mode & S_IXGRP) ? "x" : "-");
+    printf((st.st_mode & S_IROTH) ? "r" : "-");
+    printf((st.st_mode & S_IWOTH) ? "w" : "-");
+    printf((st.st_mode & S_IXOTH) ? "x" : "-");
+    printf("\n");
+
+    // Removing the file
+    if (remove(filename) != 0) {
+        perror("Error deleting file");
+        return 1;
+    }
+    printf("File deleted successfully.\n");
+
+    return 0;
+}
